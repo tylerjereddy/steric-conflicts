@@ -1,0 +1,7 @@
+sudo: required
+
+services:
+  - docker
+
+before_install:
+  - docker build -t tylerreddy/steric-conflicts docker_build/
