@@ -4,4 +4,6 @@ services:
   - docker
 
 before_install:
+  - sudo apt-get update
+  - sudo apt-get install docker-engine
   - docker build -t tylerreddy/steric-conflicts docker_build/
