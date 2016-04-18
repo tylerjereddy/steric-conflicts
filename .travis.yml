@@ -4,7 +4,6 @@ services:
   - docker
 
 before_install:
-  - export DEBIAN_FRONTEND=noninteractive
   - sudo apt-get update
-  - sudo apt-get -q -y install docker-engine
+  - sudo DEBIAN_FRONTEND=noninteractive apt-get -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confnew" install docker-engine
   - docker build -t tylerreddy/steric-conflicts docker_build/
