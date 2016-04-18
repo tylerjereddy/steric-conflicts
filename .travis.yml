@@ -3,6 +3,10 @@ sudo: required
 language: python
 python:
   - "2.7"
+addons:
+  apt:
+    packages:
+	python-nose2
 
 services:
   - docker
@@ -13,3 +17,6 @@ before_install:
 
 install:
   - docker build -t tylerreddy/steric-conflicts docker_build/
+
+script:
+  - nosetests
