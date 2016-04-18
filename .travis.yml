@@ -6,7 +6,7 @@ python:
 addons:
   apt:
     packages:
-	python-nose2
+    - python-nose2
 
 services:
   - docker
