@@ -4,6 +4,7 @@ ARG DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update && apt-get install -y \
 	git \
+	python-pip \
 	wget 
 
 RUN echo 'export PATH=/opt/conda/bin:$PATH' > /etc/profile.d/conda.sh && \
@@ -15,6 +16,7 @@ ENV PATH /opt/conda/bin:$PATH
 
 RUN conda install numpy scipy
 RUN conda config --add channels MDAnalysis && conda install mdanalysis=0.14
+RUN pip install coveralls
 
 ADD *py /steric_analysis/
 ADD *gro /steric_analysis/
