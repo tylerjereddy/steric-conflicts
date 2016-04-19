@@ -23,3 +23,7 @@ RUN pip install coveralls
 
 ADD *py /steric_analysis/
 ADD *gro /steric_analysis/
+
+#coveralls currently requires a git repo & unique commit to submit the report, so
+#do this artificially:
+RUN cd /steric_analysis && git init && git commit -m "Testing."
