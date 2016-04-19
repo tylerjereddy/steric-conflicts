@@ -1,13 +1,5 @@
 sudo: required
 
-language: python
-python:
-  - "2.7"
-addons:
-  apt:
-    packages:
-    - python-nose2
-
 services:
   - docker
 
