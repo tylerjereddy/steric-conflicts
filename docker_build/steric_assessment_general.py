@@ -3,8 +3,12 @@ Author: Tyler Reddy
 Purpose of module: Demonstrate utility of Python multiprocessing module for analysis of a single coordinate file with MDAnalysis. This module is also a useful general piece of code for analyzing a system that may have 'questionable contacts--' steric issues with atoms potentially too close together for any number of reasons (perhaps the most common use case would be after the construction of a complex system).
 '''
 
-#import some useful modules:
-import MDAnalysis, multiprocessing, time, sys, numpy, scipy
+import MDAnalysis
+import multiprocessing
+import time 
+import sys
+import numpy as np
+import scipy
 import cPickle as pickle
 
 #We normally parse coordinate files with MDAnalysis as Universe objects, but these contain open files and cannot easily be passed between cores, so instead each core will launch the same analysis function with a different set of arguments, load a copy of the universe object, perform the analysis on the subset of the coordinates specified in the arguments, and finally return the results to the parent process for aggregation with results from other cores
@@ -28,8 +32,8 @@ def perform_portion_of_steric_analysis_on_individual_core(coord_file, species_st
     while current_species_index < species_end_index:
         current_species_residue_start_index = current_species_index #first atom in current residue
         current_species_residue_end_index = current_species_index + (particles_per_residue - 1) #last atom in current residue
-        atom_selection_within_cutoff_angstroms = input_universe.selectAtoms('around {cutoff} (bynum {start_index}:{end_index})'.format(start_index = current_species_residue_start_index, end_index = current_species_residue_end_index, cutoff = cutoff)) #simply select all atoms within cutoff A of the current residue
-        number_of_atoms_within_cutoff = atom_selection_within_cutoff_angstroms.numberOfAtoms() #since my plan is to make a histogram, I'm really just interested in the number of violations for a given residue
+        atom_selection_within_cutoff_angstroms = input_universe.select_atoms('around {cutoff} (bynum {start_index}:{end_index})'.format(start_index = current_species_residue_start_index, end_index = current_species_residue_end_index, cutoff = cutoff)) #simply select all atoms within cutoff A of the current residue
+        number_of_atoms_within_cutoff = atom_selection_within_cutoff_angstroms.n_atoms #since my plan is to make a histogram, I'm really just interested in the number of violations for a given residue
         if number_of_atoms_within_cutoff > 0:
             print 'Violating residue start index:', current_species_residue_start_index ,'end index:', current_species_residue_end_index
         print multiprocessing.current_process().name, 'number of atoms within cutoff',number_of_atoms_within_cutoff #to monitor on a per-process basis at the terminal
@@ -43,7 +47,7 @@ def adjust_arrays_to_avoid_splaying(list_index_arrays, particles_per_residue):
     current_element = 0
     for index_array in list_index_arrays: #each index_array is destined for a core (later in the code)
         while index_array.size % particles_per_residue != 0: #don't exit the while loop until you have an integer number of residues accounted for in the index array
-            index_array = numpy.concatenate((index_array,numpy.reshape(index_array[-1] + 1,(1,)))) #add the next index value
+            index_array = np.concatenate((index_array,np.reshape(index_array[-1] + 1,(1,)))) #add the next index value
             #each time I add a value to the end of the above array I'll have to remove the first element of the subsequent array to avoid duplicating an index in my overall analysis:
             list_index_arrays[current_element + 1] = list_index_arrays[current_element + 1][1:]
         #it might seem like the above could fail on the last element (last array) in the list, but by definition that array should always be divisible by the particles_per_residue when we get to it because the overall number of indices is also divisible by the number of particles in a residue, so the remaining indices (last element / array) should not require modification
@@ -57,9 +61,9 @@ def main(start_index,end_index,coordinate_file, particles_per_residue, cutoff):
     #I need to split the topology indices into contiguous chunks of residues (NO partial residues) so that different index ranges can be parsed by different cores:
     available_cores = multiprocessing.cpu_count() #determine number of CPUs available
     #start with a single array containing the full range of indices:
-    index_array = numpy.arange(start_index,end_index + 1) #see numpy documentation
+    index_array = np.arange(start_index,end_index + 1) #see numpy documentation
     #produce a list of arrays to be passed to the cores, with each array as evenly balanced as possible in terms of the number of indices it contains (use numpy array_split):
-    list_index_arrays_to_distribute_to_cores = numpy.array_split(index_array,available_cores)
+    list_index_arrays_to_distribute_to_cores = np.array_split(index_array,available_cores)
     #**note that an even (or uneven) workload balance between cores does NOT guarantee that residues are not splayed across cores; for this, I'll use the function defined above--which will shuffle the indices assigned to each core until each core is assigned an index range that contains only WHOLE residues (more important priority than a precise load balance):
     list_index_arrays_to_distribute_to_cores = adjust_arrays_to_avoid_splaying(list_index_arrays = list_index_arrays_to_distribute_to_cores, particles_per_residue = particles_per_residue)
     #**want to be absolutely certain that each core receives a number of indices that is divisible by particles_per_residue:
@@ -85,9 +89,6 @@ def main(start_index,end_index,coordinate_file, particles_per_residue, cutoff):
     pool.close()
     pool.join()
     return cumulative_parent_list_steric_violation_counts #so if you use this code within another module, you'll just get the overall list of steric violations per residue
-
-def test_code():
-    pass #place test code here eventually if you need to unit test
 
 if __name__ == '__main__': #basically, only execute what follows if this module is executed as a top-level script (directly called on the command line rather than imported)
     test_code()
