@@ -17,3 +17,4 @@ RUN conda install numpy scipy
 RUN conda config --add channels MDAnalysis && conda install mdanalysis=0.14
 
 ADD *py /steric_analysis/
+ADD *gro /steric_analysis/
