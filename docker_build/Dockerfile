@@ -26,5 +26,9 @@ ADD *gro /steric_analysis/
 
 #coveralls currently requires a git repo & unique commit to submit the report, so
 #do this artificially:
-RUN cd /steric_analysis && git config --global user.email "dummy@dummy.com" && \
-     git config --global user.name "Dummy" && git init && git commit -m "Testing."
+RUN cd /steric_analysis && \
+    git config --global user.email "dummy@dummy.com" && \
+    git config --global user.name "Dummy" && \
+    git init && \
+    git add * && \
+    git commit -m "Dummy."
