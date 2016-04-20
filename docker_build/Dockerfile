@@ -4,6 +4,7 @@ ARG DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update && apt-get install -y \
 	git \
+	libglib2.0-0 \
 	python-pip \
 	wget 
 
