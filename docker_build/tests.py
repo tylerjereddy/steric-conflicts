@@ -45,3 +45,9 @@ class TestIdenticalCoords(unittest.TestCase):
         list_DPPC_steric_violations = steric_assessment_general.main(start_index = 1,end_index = 24, coordinate_file = 'dppc_simple_copies.gro',particles_per_residue = 12, cutoff = 2.0)
         self.assertEqual(len(list_DPPC_steric_violations), 2, "list_DPPC_steric_violations should have a length of 2 because there are only two residues to probe.")
         self.assertEqual(list_DPPC_steric_violations, [12,12], "Each DPPC molecule should have 12 steric violations, as both DPPC molecules in this test have the same coords.")
+
+    def test_single_core_activity(self):
+        '''Simple test to probe perform_portion_of_steric_analysis_on_individual_core() function.'''
+        single_DPPC_list_steric_viols = steric_assessment_general.perform_portion_of_steric_analysis_on_individual_core('dppc_simple_copies.gro', 1, 12, 12, cutoff=2.0)
+        self.assertEqual(single_DPPC_list_steric_viols, [12])
+
