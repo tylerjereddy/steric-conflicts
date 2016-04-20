@@ -30,3 +30,10 @@ class TestVesicleStericViolations(unittest.TestCase):
         '''Test for proper length of ordered_list_steric_violation_counts.'''
         list_DPPC_steric_violations = steric_assessment_general.main(start_index = self.start_index,end_index = self.end_index, coordinate_file = 'dppc_vesicle.gro',particles_per_residue = self.particles_per_residue, cutoff = 8.0)
         self.assertEqual(len(list_DPPC_steric_violations), self.num_DPPC_residues, "The number of DPPC steric violation counts should match the total number of DPPC residues in the vesicle system.")
+
+    def test_cutoff_sensitivity(self):
+        '''Test to ensure that using a larger cutoff leads to far more steric conflicts counted per residue.'''
+        list_DPPC_steric_violations_small_cutoff = steric_assessment_general.main(start_index = self.start_index,end_index = self.end_index, coordinate_file = 'dppc_vesicle.gro',particles_per_residue = self.particles_per_residue, cutoff = 2.0)
+        list_DPPC_steric_violations_large_cutoff = steric_assessment_general.main(start_index = self.start_index,end_index = self.end_index, coordinate_file = 'dppc_vesicle.gro',particles_per_residue = self.particles_per_residue, cutoff = 20.0)
+        self.assertGreater(np.array(list_DPPC_steric_violations_large_cutoff).sum(), np.array(list_DPPC_steric_violations_small_cutoff).sum(), "The sum total per residue steric violations should be larger when using a larger cutoff.")
+
