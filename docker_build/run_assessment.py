@@ -16,8 +16,8 @@ parser.add_argument("end_index", type=int)
 parser.add_argument("coord_filepath", type=str)
 parser.add_argument("particles_per_residue", type=int)
 parser.add_argument("cutoff", type=float, help="cutoff (A)")
-parser.add_argument("pickle_filename", type=str, default='steric_viols.p')
-parser.add_argument("plot_filename", type=str, default='steric_histogram.png')
+parser.add_argument("pickle_filename", type=str, default='steric_viols.p', nargs='?')
+parser.add_argument("plot_filename", type=str, default='steric_histogram.png', nargs='?')
 args = parser.parse_args()
 
 #produce an overall list of per-residue steric violations using the general multicore code in another module and convert to numpy array:
