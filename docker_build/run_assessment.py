@@ -8,6 +8,7 @@ import steric_assessment_general
 import argparse
 import matplotlib
 import matplotlib.pyplot
+matplotlib.use('Agg')
 
 parser = argparse.ArgumentParser()
 parser.add_argument("start_index", type=int)
