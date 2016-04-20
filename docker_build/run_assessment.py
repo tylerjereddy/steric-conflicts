@@ -24,7 +24,7 @@ array_steric_violations = np.array(steric_assessment_general.main(start_index = 
                                                                        end_index = args.end_index,
                                                                        coordinate_file = args.coord_filepath,
                                                                        particles_per_residue = args.particles_per_residue,
-                                                                       cutoff = ars.cutoff)) 
+                                                                       cutoff = args.cutoff)) 
 
 #because this may take quite a while, pickle the array to be safe:
 pickle.dump(array_steric_violations,open(args.pickle_filename,'wb'))
