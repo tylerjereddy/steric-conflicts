@@ -4,7 +4,10 @@ ARG DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update && apt-get install -y \
 	git \
+	libfontconfig1 \
 	libglib2.0-0 \
+	libsm6 \
+	libxrender1 \
 	python-pip \
 	wget 
 
