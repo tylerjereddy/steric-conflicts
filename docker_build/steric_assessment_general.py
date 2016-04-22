@@ -42,8 +42,24 @@ def perform_portion_of_steric_analysis_on_individual_core(coord_file, species_st
     print multiprocessing.current_process().name, 'Finishing' #to monitor end of this process on terminal
     return ordered_list_steric_violation_counts #remember, this list only covers the steric violations for the subset of residues parsed on a particular core
 
-def adjust_arrays_to_avoid_splaying(list_index_arrays, particles_per_residue):
+def adjust_arrays_to_avoid_splaying(start_index,end_index,particles_per_residue, available_cores = None):
     '''Adjust the arrays of indices sent to each core to avoid the splaying of residues across cores. After other code roughly balances out the number of indices to be sent to each core, this function takes the list of index arrays destined for each core and performs an adjustment such that the returned list contains index arrays which only have whole residues--NO splaying of residues between arrays/cores can be tolerated for sensible results. Naturally, it would be much simpler to deal with residue numbers rather than indices in simple cases, but index numbers are often more reliable in extremely large systems or in other coordinate files where there may be non-unique residue numbers.'''
+    #I need to split the topology indices into contiguous chunks of residues (NO partial residues) so that different index ranges can be parsed by different cores:
+    if available_cores == None: #detect automatically
+        available_cores = multiprocessing.cpu_count() #determine number of CPUs available
+    else: #specify available cores -- mostly for testing purposes
+        available_cores = available_cores
+    #start with a single array containing the full range of indices:
+    index_array = np.arange(start_index,end_index + 1) #see numpy documentation
+    #produce a list of arrays to be passed to the cores, with each array as evenly balanced as possible in terms of the number of indices it contains (use numpy array_split):
+    num_indices = index_array.size
+    num_residues = int(num_indices / float(particles_per_residue))
+
+    if num_residues <= available_cores:
+        available_cores = num_residues
+
+    list_index_arrays = np.array_split(index_array,available_cores)
+    #**note that an even (or uneven) workload balance between cores does NOT guarantee that residues are not splayed across cores; for this, I'll use the function defined above--which will shuffle the indices assigned to each core until each core is assigned an index range that contains only WHOLE residues (more important priority than a precise load balance):
     current_element = 0
     for index_array in list_index_arrays: #each index_array is destined for a core (later in the code)
         while index_array.size % particles_per_residue != 0: #don't exit the while loop until you have an integer number of residues accounted for in the index array
@@ -58,14 +74,8 @@ def adjust_arrays_to_avoid_splaying(list_index_arrays, particles_per_residue):
 #I'm now going to write a main control function for the module, so that when it is imported for a specific-use case on any arbitrary number of cores, the code will attempt to gracefully distribute the workload over the various cores:
 def main(start_index,end_index,coordinate_file, particles_per_residue, cutoff):
     '''Main control function of the process. The arguments are as described for the per-core function above, except that the start and end indices are the overall start and end indices whereas the previous function receives an index range which is a subset of the index range specified here (this housekeeping work is dealt with by the code in this function).'''
-    #I need to split the topology indices into contiguous chunks of residues (NO partial residues) so that different index ranges can be parsed by different cores:
-    available_cores = multiprocessing.cpu_count() #determine number of CPUs available
-    #start with a single array containing the full range of indices:
-    index_array = np.arange(start_index,end_index + 1) #see numpy documentation
-    #produce a list of arrays to be passed to the cores, with each array as evenly balanced as possible in terms of the number of indices it contains (use numpy array_split):
-    list_index_arrays_to_distribute_to_cores = np.array_split(index_array,available_cores)
-    #**note that an even (or uneven) workload balance between cores does NOT guarantee that residues are not splayed across cores; for this, I'll use the function defined above--which will shuffle the indices assigned to each core until each core is assigned an index range that contains only WHOLE residues (more important priority than a precise load balance):
-    list_index_arrays_to_distribute_to_cores = adjust_arrays_to_avoid_splaying(list_index_arrays = list_index_arrays_to_distribute_to_cores, particles_per_residue = particles_per_residue)
+    list_index_arrays_to_distribute_to_cores = adjust_arrays_to_avoid_splaying(start_index = start_index, end_index = end_index, particles_per_residue = particles_per_residue)
+    print 'list_index_arrays_to_distribute_to_cores (adjusted):', list_index_arrays_to_distribute_to_cores
     #**want to be absolutely certain that each core receives a number of indices that is divisible by particles_per_residue:
     for index_array_for_core in list_index_arrays_to_distribute_to_cores:
         assert index_array_for_core.size % particles_per_residue == 0, "index arrays are splaying residues across cores"
