@@ -86,32 +86,40 @@ class TestAdjustArrays(unittest.TestCase):
 
     def test_adjust_arrays_1_core(self):
         list_index_arrays_obtained = steric_assessment_general.adjust_arrays_to_avoid_splaying(self.list_index_arrays_1_core, 12)
-        self.assertEqual(list_index_arrays_obtained, self.list_index_arrays_expected_1_core)
+        for actual_array, desired_array in zip(list_index_arrays_obtained, self.list_index_arrays_expected_1_core):
+            np.testing.assert_allclose(actual_array, desired_array, rtol=1e-7) 
     
     def test_adjust_arrays_2_cores(self):
         list_index_arrays_obtained = steric_assessment_general.adjust_arrays_to_avoid_splaying(self.list_index_arrays_2_cores, 12)
-        self.assertEqual(list_index_arrays_obtained, self.list_index_arrays_expected_2_plus_cores)
+        for actual_array, desired_array in zip(list_index_arrays_obtained, self.list_index_arrays_expected_2_plus_cores):
+            np.testing.assert_allclose(actual_array, desired_array, rtol=1e-7) 
 
     def test_adjust_arrays_3_cores(self):
         list_index_arrays_obtained = steric_assessment_general.adjust_arrays_to_avoid_splaying(self.list_index_arrays_3_cores, 12)
-        self.assertEqual(list_index_arrays_obtained, self.list_index_arrays_expected_2_plus_cores)
+        for actual_array, desired_array in zip(list_index_arrays_obtained, self.list_index_arrays_expected_2_plus_cores):
+            np.testing.assert_allclose(actual_array, desired_array, rtol=1e-7) 
 
     def test_adjust_arrays_7_cores(self):
         list_index_arrays_obtained = steric_assessment_general.adjust_arrays_to_avoid_splaying(self.list_index_arrays_7_cores, 12)
-        self.assertEqual(list_index_arrays_obtained, self.list_index_arrays_expected_2_plus_cores)
+        for actual_array, desired_array in zip(list_index_arrays_obtained, self.list_index_arrays_expected_2_plus_cores):
+            np.testing.assert_allclose(actual_array, desired_array, rtol=1e-7) 
 
     def test_adjust_arrays_12_cores(self):
         list_index_arrays_obtained = steric_assessment_general.adjust_arrays_to_avoid_splaying(self.list_index_arrays_12_cores, 12)
-        self.assertEqual(list_index_arrays_obtained, self.list_index_arrays_expected_2_plus_cores)
+        for actual_array, desired_array in zip(list_index_arrays_obtained, self.list_index_arrays_expected_2_plus_cores):
+            np.testing.assert_allclose(actual_array, desired_array, rtol=1e-7) 
 
     def test_adjust_arrays_19_cores(self):
         list_index_arrays_obtained = steric_assessment_general.adjust_arrays_to_avoid_splaying(self.list_index_arrays_19_cores, 12)
-        self.assertEqual(list_index_arrays_obtained, self.list_index_arrays_expected_2_plus_cores)
+        for actual_array, desired_array in zip(list_index_arrays_obtained, self.list_index_arrays_expected_2_plus_cores):
+            np.testing.assert_allclose(actual_array, desired_array, rtol=1e-7) 
 
     def test_adjust_arrays_36_cores(self):
         list_index_arrays_obtained = steric_assessment_general.adjust_arrays_to_avoid_splaying(self.list_index_arrays_36_cores, 12)
-        self.assertEqual(list_index_arrays_obtained, self.list_index_arrays_expected_2_plus_cores)
+        for actual_array, desired_array in zip(list_index_arrays_obtained, self.list_index_arrays_expected_2_plus_cores):
+            np.testing.assert_allclose(actual_array, desired_array, rtol=1e-7) 
 
     def test_adjust_arrays_70_cores(self):
         list_index_arrays_obtained = steric_assessment_general.adjust_arrays_to_avoid_splaying(self.list_index_arrays_70_cores, 12)
-        self.assertEqual(list_index_arrays_obtained, self.list_index_arrays_expected_2_plus_cores)
+        for actual_array, desired_array in zip(list_index_arrays_obtained, self.list_index_arrays_expected_2_plus_cores):
+            np.testing.assert_allclose(actual_array, desired_array, rtol=1e-7) 
