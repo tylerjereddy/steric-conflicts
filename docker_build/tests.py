@@ -56,70 +56,58 @@ class TestAdjustArrays(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         #list index arrays based on two DPPC residues being probed across N cores
-        cls.index_array = np.arange(1,25)
-        cls.list_index_arrays_1_core = np.array_split(cls.index_array, 1)
-        cls.list_index_arrays_2_cores = np.array_split(cls.index_array, 2)
-        cls.list_index_arrays_3_cores = np.array_split(cls.index_array, 3)
-        cls.list_index_arrays_7_cores = np.array_split(cls.index_array, 7)
-        cls.list_index_arrays_12_cores = np.array_split(cls.index_array, 12)
-        cls.list_index_arrays_19_cores = np.array_split(cls.index_array, 19)
-        cls.list_index_arrays_36_cores = np.array_split(cls.index_array, 36)
-        cls.list_index_arrays_70_cores = np.array_split(cls.index_array, 70)
+        cls.start_index = 1
+        cls.end_index = 24
+        cls.particles_per_residue = 12
  
         cls.list_index_arrays_expected_2_plus_cores = [np.arange(1,13), np.arange(13,25)] #there are only two residues, so never more than two arrays in the list irrespective of the number of cores
         cls.list_index_arrays_expected_1_core = [np.arange(1,25)] #for a single core, only a single array containing both residues can be distributed
 
     @classmethod
     def tearDownClass(cls):
-        del cls.index_array 
-        del cls.list_index_arrays_1_core 
-        del cls.list_index_arrays_2_cores 
-        del cls.list_index_arrays_3_cores 
-        del cls.list_index_arrays_7_cores
-        del cls.list_index_arrays_12_cores 
-        del cls.list_index_arrays_19_cores
-        del cls.list_index_arrays_36_cores 
-        del cls.list_index_arrays_70_cores 
+        del cls.start_index 
+        del cls.end_index 
+        del cls.particles_per_residue 
  
         del cls.list_index_arrays_expected_2_plus_cores 
         del cls.list_index_arrays_expected_1_core 
 
     def test_adjust_arrays_1_core(self):
-        list_index_arrays_obtained = steric_assessment_general.adjust_arrays_to_avoid_splaying(self.list_index_arrays_1_core, 12)
+        list_index_arrays_obtained = steric_assessment_general.adjust_arrays_to_avoid_splaying(self.start_index, self.end_index, 12, available_cores = 1)
         for actual_array, desired_array in zip(list_index_arrays_obtained, self.list_index_arrays_expected_1_core):
             np.testing.assert_allclose(actual_array, desired_array, rtol=1e-7) 
     
     def test_adjust_arrays_2_cores(self):
-        list_index_arrays_obtained = steric_assessment_general.adjust_arrays_to_avoid_splaying(self.list_index_arrays_2_cores, 12)
+        list_index_arrays_obtained = steric_assessment_general.adjust_arrays_to_avoid_splaying(self.start_index, self.end_index, 12, available_cores = 2)
         for actual_array, desired_array in zip(list_index_arrays_obtained, self.list_index_arrays_expected_2_plus_cores):
             np.testing.assert_allclose(actual_array, desired_array, rtol=1e-7) 
 
     def test_adjust_arrays_3_cores(self):
-        list_index_arrays_obtained = steric_assessment_general.adjust_arrays_to_avoid_splaying(self.list_index_arrays_3_cores, 12)
+        list_index_arrays_obtained = steric_assessment_general.adjust_arrays_to_avoid_splaying(self.start_index, self.end_index, 12, available_cores = 3)
         for actual_array, desired_array in zip(list_index_arrays_obtained, self.list_index_arrays_expected_2_plus_cores):
             np.testing.assert_allclose(actual_array, desired_array, rtol=1e-7) 
 
     def test_adjust_arrays_7_cores(self):
-        list_index_arrays_obtained = steric_assessment_general.adjust_arrays_to_avoid_splaying(self.list_index_arrays_7_cores, 12)
+        list_index_arrays_obtained = steric_assessment_general.adjust_arrays_to_avoid_splaying(self.start_index, self.end_index, 12, available_cores = 7)
         for actual_array, desired_array in zip(list_index_arrays_obtained, self.list_index_arrays_expected_2_plus_cores):
             np.testing.assert_allclose(actual_array, desired_array, rtol=1e-7) 
 
     def test_adjust_arrays_12_cores(self):
-        list_index_arrays_obtained = steric_assessment_general.adjust_arrays_to_avoid_splaying(self.list_index_arrays_12_cores, 12)
+        list_index_arrays_obtained = steric_assessment_general.adjust_arrays_to_avoid_splaying(self.start_index, self.end_index, 12, available_cores = 12)
         for actual_array, desired_array in zip(list_index_arrays_obtained, self.list_index_arrays_expected_2_plus_cores):
             np.testing.assert_allclose(actual_array, desired_array, rtol=1e-7) 
 
     def test_adjust_arrays_19_cores(self):
-        list_index_arrays_obtained = steric_assessment_general.adjust_arrays_to_avoid_splaying(self.list_index_arrays_19_cores, 12)
+        list_index_arrays_obtained = steric_assessment_general.adjust_arrays_to_avoid_splaying(self.start_index, self.end_index, 12, available_cores = 19)
         for actual_array, desired_array in zip(list_index_arrays_obtained, self.list_index_arrays_expected_2_plus_cores):
             np.testing.assert_allclose(actual_array, desired_array, rtol=1e-7) 
 
     def test_adjust_arrays_36_cores(self):
-        list_index_arrays_obtained = steric_assessment_general.adjust_arrays_to_avoid_splaying(self.list_index_arrays_36_cores, 12)
+        list_index_arrays_obtained = steric_assessment_general.adjust_arrays_to_avoid_splaying(self.start_index, self.end_index, 12, available_cores = 36)
         for actual_array, desired_array in zip(list_index_arrays_obtained, self.list_index_arrays_expected_2_plus_cores):
             np.testing.assert_allclose(actual_array, desired_array, rtol=1e-7) 
 
     def test_adjust_arrays_70_cores(self):
-        list_index_arrays_obtained = steric_assessment_general.adjust_arrays_to_avoid_splaying(self.list_index_arrays_70_cores, 12)
+        list_index_arrays_obtained = steric_assessment_general.adjust_arrays_to_avoid_splaying(self.start_index, self.end_index, 12, available_cores = 70)
         for actual_array, desired_array in zip(list_index_arrays_obtained, self.list_index_arrays_expected_2_plus_cores):
             np.testing.assert_allclose(actual_array, desired_array, rtol=1e-7) 
