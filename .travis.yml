@@ -11,7 +11,7 @@ install:
   - docker build -t tylerreddy/steric-conflicts docker_build/
 
 script:
-  - docker run -e "COVERALLS_REPO_TOKEN=$COVERALLS_REPO_TOKEN" -i -t tylerreddy/steric-conflicts /bin/sh -c "cd /steric_analysis; nosetests --with-coverage --cover-package steric_assessment_general tests.py; coveralls"
+  - docker run -e "COVERALLS_REPO_TOKEN=$COVERALLS_REPO_TOKEN" -i -t tylerreddy/steric-conflicts /bin/sh -c "cd /steric_analysis; nosetests --verbosity=3 --with-coverage --cover-package steric_assessment_general tests.py; coveralls"
 
 after_success:
   - docker login -e="$DOCKER_EMAIL" -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
