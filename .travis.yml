@@ -14,5 +14,7 @@ script:
   - docker run -e "COVERALLS_REPO_TOKEN=$COVERALLS_REPO_TOKEN" -i -t tylerreddy/steric-conflicts /bin/sh -c "cd /steric_analysis; nosetests --verbosity=3 --with-coverage --cover-package steric_assessment_general tests.py 2>&1 | tee nose.log; coveralls; tail -1 nose.log | grep -q OK"
 
 after_success:
-  - docker login -e="$DOCKER_EMAIL" -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
-  - docker push tylerreddy/steric-conflicts
+  - if [ "$TRAVIS_BRANCH" == "master" ]; then
+     docker login -e="$DOCKER_EMAIL" -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD";
+     docker push tylerreddy/steric-conflicts;
+    fi
