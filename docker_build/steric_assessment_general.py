@@ -75,7 +75,6 @@ def adjust_arrays_to_avoid_splaying(start_index,end_index,particles_per_residue,
 def main(start_index,end_index,coordinate_file, particles_per_residue, cutoff):
     '''Main control function of the process. The arguments are as described for the per-core function above, except that the start and end indices are the overall start and end indices whereas the previous function receives an index range which is a subset of the index range specified here (this housekeeping work is dealt with by the code in this function).'''
     list_index_arrays_to_distribute_to_cores = adjust_arrays_to_avoid_splaying(start_index = start_index, end_index = end_index, particles_per_residue = particles_per_residue)
-    print 'list_index_arrays_to_distribute_to_cores (adjusted):', list_index_arrays_to_distribute_to_cores
     #**want to be absolutely certain that each core receives a number of indices that is divisible by particles_per_residue:
     for index_array_for_core in list_index_arrays_to_distribute_to_cores:
         assert index_array_for_core.size % particles_per_residue == 0, "index arrays are splaying residues across cores"
