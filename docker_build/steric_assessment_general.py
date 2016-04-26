@@ -98,6 +98,3 @@ def main(start_index,end_index,coordinate_file, particles_per_residue, cutoff):
     pool.close()
     pool.join()
     return cumulative_parent_list_steric_violation_counts #so if you use this code within another module, you'll just get the overall list of steric violations per residue
-
-if __name__ == '__main__': #basically, only execute what follows if this module is executed as a top-level script (directly called on the command line rather than imported)
-    test_code()
