@@ -33,13 +33,14 @@ pickle.dump(array_steric_violations,open(args.pickle_filename,'wb'))
 #now plot the data (default plot -- the user can use the pickled data to customize their own):
 fig = matplotlib.pyplot.figure()
 ax = fig.add_subplot(111)
-matplotlib.pyplot.xticks(rotation=90)
-histogram, bins = np.histogram(array_steric_violations,bins=20)
-bincenters = 0.5 * (bins[1:] + bins[:-1]) #adjust to center them 
+matplotlib.pyplot.xticks(rotation=0)
+unique_contact_counts, num_residues_with_those_counts = np.unique(array_steric_violations, return_counts=True)
 percent_denominator = array_steric_violations.size / 100.0
-ax.bar(bincenters, histogram / percent_denominator,facecolor = 'green',alpha=0.75,width=2) #percent histogram
-ax.set_xlim(-1,95)
+ax.bar(unique_contact_counts, num_residues_with_those_counts / percent_denominator,facecolor = 'green',alpha=0.75,width=0.7, align='center') #percent histogram
+ax.set_xlim(-1, unique_contact_counts.max() + 1)
+ax.set_xticks(np.arange(-1,unique_contact_counts.max() + 2))
 ax.set_xlabel('# of contacts within {cutoff} $\AA$'.format(cutoff=args.cutoff))
 ax.set_ylabel('% of residues')
-fig.set_size_inches(4,6)
+fig.set_size_inches(6,6)
+fig.subplots_adjust(bottom=0.2, left=0.2)
 fig.savefig(args.plot_filename,dpi=300)
