@@ -18,7 +18,7 @@ RUN echo 'export PATH=/opt/conda/bin:$PATH' > /etc/profile.d/conda.sh && \
 
 ENV PATH /opt/conda/bin:$PATH
 
-RUN conda install numpy scipy
+RUN conda install numpy=1.11.0 scipy=0.17.0
 RUN conda config --add channels MDAnalysis && conda install mdanalysis=0.14
 RUN pip install coveralls
 
