@@ -29,4 +29,18 @@ The code is executed entirely in the container and the results are placed in the
 
 The pickled (serialized) data can be opened using the Python pickle module so that you may produce custom plots / analyses as you see fit. The data structure is simply an array of per-residue steric violation counts within the specified threshold (cutoff in Angstroms).
 
+Consider the case of checking for steric conflicts within 2.0 Angstroms of all the DPPC residues in the above vesicle coordinate file (which is already in the docker image for testing purposes). The analysis command and resulting (default) plot are shown below:
+```
+docker run -v /username/steric_analysis_folder:/analysis_in_container tylerreddy/steric-conflicts /bin/sh -c "python /steric_analysis/run_assessment.py -start_index 1 -end_index 10524 -coord_filepath /steric_analysis/dppc_vesicle.gro -particles_per_residue 12 -cutoff 2.0 -pickle_filename /analysis_in_container/steric_viols_DPPC.p -plot_filename /analysis_in_container/steric_histogram_DPPC.png"
+```
+![DPPC_vesicle_2_Angstroms](./images/steric_histogram_DPPC.png)
 
+Unsurprisingly, a snapshot from an actual example simulation does not have any steric conflicts. For illustrative purposes, we will inflate the cutoff to 8.0 Angstroms to see a demonstration of steric conflicts:
+```
+docker run -v /username/steric_analysis_folder:/analysis_in_container tylerreddy/steric-conflicts /bin/sh -c "python /steric_analysis/run_assessment.py -start_index 1 -end_index 10524 -coord_filepath /steric_analysis/dppc_vesicle.gro -particles_per_residue 12 -cutoff 8.0 -pickle_filename /analysis_in_container/steric_viols_DPPC_8.p -plot_filename /analysis_in_container/steric_histogram_DPPC_8.png"
+```
+![DPPC_vesicle_8_Angstroms](./images/steric_histogram_DPPC_8.png)
+
+Clearly, increasing the cutoff has introduced steric conflicts. As this is the default plot the x-axis isn't perfectly formatted (feel free to submit a PR to improve the aesthetics / flexibility of the default plot). However, one may easily use the pickle file to produce any kind of custom plot.
+
+Of course, identifying steric conflicts is often only the first step in a workflow. You may wish to script to the process to run through all the residues in your system and accumulate all the data from different pickle files into an overall steric analysis plot, resolve the steric conflicts using an alchemical approach (i.e., http://pubs.acs.org/doi/abs/10.1021/ct501111d ) and then running the global steric analysis again to confirm that conflicts have been resolved before attempting an energy minimization / simulation. Efforts are underway to facilitate the automation of this process / steric conflict resolution loop.
