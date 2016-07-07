@@ -18,7 +18,7 @@ RUN echo 'export PATH=/opt/conda/bin:$PATH' > /etc/profile.d/conda.sh && \
 
 ENV PATH /opt/conda/bin:$PATH
 
-RUN conda install numpy=1.11.0 scipy=0.17.0 cython nose
+RUN conda install numpy=1.11.0 scipy=0.17.0 cython nose matplotlib
 RUN git clone https://github.com/MDAnalysis/mdanalysis.git /src/mdanalysis
 RUN pip install -e /src/mdanalysis/package
 RUN pip install coveralls
