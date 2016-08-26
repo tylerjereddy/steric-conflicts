@@ -111,3 +111,30 @@ class TestAdjustArrays(unittest.TestCase):
         list_index_arrays_obtained = steric_assessment_general.adjust_arrays_to_avoid_splaying(self.start_index, self.end_index, 12, available_cores = 70)
         for actual_array, desired_array in zip(list_index_arrays_obtained, self.list_index_arrays_expected_2_plus_cores):
             np.testing.assert_allclose(actual_array, desired_array, rtol=1e-7) 
+
+class TestSortedViols(unittest.TestCase):
+    '''Test(s) related to the proper sorting of cumulative_parent_list_steric_violation_counts.'''
+
+    def setUp(self):
+        self.u = MDAnalysis.Universe('dppc_topology_sort_probing.gro')
+        # first 8 residues on top of each other; the 9th is alone and should have no steric conflicts; the next 5 are on top of the first 8 again; the last one is alone again
+        self.known_zero_steric_conflict_indices = np.array([8, 14])
+        self.start_index = 1
+        self.end_index = 180
+        self.particles_per_residue = 12
+        pass
+
+    def tearDown(self):
+        del self.u
+        del self.start_index
+        del self.end_index
+        del self.known_zero_steric_conflict_indices
+        del self.particles_per_residue
+
+    def test_indices_minimum_steric_conflicts(self):
+        '''Check that steric conflict counts are properly sorted by the topological positions of the corresponding residues for an artificially constructed coordinate file where I know with certainty which residues have no steric conflicts. Related to Issue #8.'''
+        list_DPPC_steric_violations = steric_assessment_general.main(start_index = self.start_index,end_index = self.end_index, coordinate_file = 'dppc_topology_sort_probing.gro',particles_per_residue = self.particles_per_residue, cutoff = 2.0)
+        array_DPPC_steric_viols = np.array(list_DPPC_steric_violations)
+        obtained_zero_steric_conflict_indices = np.where(array_DPPC_steric_viols == 0)[0]
+        np.testing.assert_array_equal(obtained_zero_steric_conflict_indices, self.known_zero_steric_conflict_indices)
+
