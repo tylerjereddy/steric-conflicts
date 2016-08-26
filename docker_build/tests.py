@@ -48,8 +48,8 @@ class TestIdenticalCoords(unittest.TestCase):
 
     def test_single_core_activity(self):
         '''Simple test to probe perform_portion_of_steric_analysis_on_individual_core() function.'''
-        single_DPPC_list_steric_viols = steric_assessment_general.perform_portion_of_steric_analysis_on_individual_core('dppc_simple_copies.gro', 1, 12, 12, cutoff=2.0)
-        self.assertEqual(single_DPPC_list_steric_viols, [12])
+        single_DPPC_dict_steric_viols = steric_assessment_general.perform_portion_of_steric_analysis_on_individual_core('dppc_simple_copies.gro', 1, 12, 12, cutoff=2.0)
+        self.assertEqual(single_DPPC_dict_steric_viols[1], 12)
 
 class TestAdjustArrays(unittest.TestCase):
     '''Test adjust_arrays_to_avoid_splaying() function, which has to be able to handle a variety of atom index data structures gracefully because different machines can have different numbers of cores.'''
