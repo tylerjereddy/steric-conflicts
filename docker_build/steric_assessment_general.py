@@ -26,7 +26,7 @@ def perform_portion_of_steric_analysis_on_individual_core(coord_file, species_st
     #as usual with MDAnalysis, we produce a Universe object in order to do most of our work, and this will be done on each core individually as there's no easy way to pass Universe objects (which contain open files) between cores:
     input_universe = MDAnalysis.Universe(coord_file) #again, this will happen on every core that runs this function
     #we'll want to count the number of atoms that are within some cutoff of a given residue, and store all the values calculated on this core in the following list:
-    ordered_list_steric_violation_counts = []
+    dict_steric_violation_counts = {}
     #now we stride through the range of indices for this particular residue (i.e, POPC or DPPC, etc.) and count the number of atoms / particles that fall within the specified cutoff:
     current_species_index = species_start_index
     while current_species_index < species_end_index:
@@ -37,10 +37,10 @@ def perform_portion_of_steric_analysis_on_individual_core(coord_file, species_st
         if number_of_atoms_within_cutoff > 0:
             print 'Violating residue start index:', current_species_residue_start_index ,'end index:', current_species_residue_end_index
         print multiprocessing.current_process().name, 'number of atoms within cutoff',number_of_atoms_within_cutoff #to monitor on a per-process basis at the terminal
-        ordered_list_steric_violation_counts.append(number_of_atoms_within_cutoff) #store the steric violation counts for each residue in the overall list for this particular process
+        dict_steric_violation_counts[current_species_index] = number_of_atoms_within_cutoff
         current_species_index += particles_per_residue #stride forward to the starting index of the next residue
     print multiprocessing.current_process().name, 'Finishing' #to monitor end of this process on terminal
-    return ordered_list_steric_violation_counts #remember, this list only covers the steric violations for the subset of residues parsed on a particular core
+    return dict_steric_violation_counts
 
 def adjust_arrays_to_avoid_splaying(start_index,end_index,particles_per_residue, available_cores = None):
     '''Adjust the arrays of indices sent to each core to avoid the splaying of residues across cores. After other code roughly balances out the number of indices to be sent to each core, this function takes the list of index arrays destined for each core and performs an adjustment such that the returned list contains index arrays which only have whole residues--NO splaying of residues between arrays/cores can be tolerated for sensible results. Naturally, it would be much simpler to deal with residue numbers rather than indices in simple cases, but index numbers are often more reliable in extremely large systems or in other coordinate files where there may be non-unique residue numbers.'''
@@ -81,12 +81,12 @@ def main(start_index,end_index,coordinate_file, particles_per_residue, cutoff):
 
     #finally, can start doing some of the multiprocessing heavy-lifting:
     pool = multiprocessing.Pool() #activate a pool of worker processes equal to the number of cores available on the system
-    cumulative_parent_list_steric_violation_counts = [] #this is where ALL per-residue steric violation counts will end up (in the parent process, progressively incorporating results from child processes)
+    cumulative_parent_dict_steric_violation_counts = {} #this is where ALL per-residue steric violation counts will end up (in the parent process, progressively incorporating results from child processes)
     #note that the order of the results from children -- > parent is not known ahead of time in this module, but we could tag the results from each child in a dictionary, etc., if we had a workflow that required this
 
-    def log_result_pool(list_from_this_process): 
-        '''This function will be called after each child process exits so that the overall list of steric violations in the parent is extended by the list of values produced in a given child.'''
-        cumulative_parent_list_steric_violation_counts.extend(list_from_this_process)
+    def log_result_pool(dict_from_this_process): 
+        '''This function will be called after each child process exits so that the overall dict of steric violations in the parent is grown by the dict of values produced in a given child.'''
+        cumulative_parent_dict_steric_violation_counts.update(dict_from_this_process)
 
     #now, iterate through the list of index arrays and hand the steric assessment tasks off to the various cores:
     for index_array in list_index_arrays_to_distribute_to_cores:
@@ -97,4 +97,8 @@ def main(start_index,end_index,coordinate_file, particles_per_residue, cutoff):
     #the next two methods basically ensure that the parent process waits for all the child processes to complete (see the multiprocessing docs for details)
     pool.close()
     pool.join()
+    # generate a list of steric violations, sorted by the topological index of the residues in the coordinate file
+    cumulative_parent_list_steric_violation_counts = []
+    for index in sorted(cumulative_parent_dict_steric_violation_counts):
+        cumulative_parent_list_steric_violation_counts.append(cumulative_parent_dict_steric_violation_counts[index])
     return cumulative_parent_list_steric_violation_counts #so if you use this code within another module, you'll just get the overall list of steric violations per residue
